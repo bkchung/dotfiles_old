@@ -1,5 +1,5 @@
 [core]
-    pager = less -q -R
+    # pager = diff-so-fancy | less --tabs=4 -RFX
     excludesfile = ~/.gitignore
     preloadindex = true
 
@@ -30,6 +30,9 @@
     graph = log --graph --date-order --all --pretty=format:'%h %Cred%d %Cgreen%ad %Cblue%cn %Creset%s' --date=short
     br = switch
     review = diff origin/master...
+    review-files = diff origin/master... --name-only
+    lg = log --color=always --max-count=10 --oneline origin/master...
+    delete-merged-branches = !git branch --merged | grep -v \\* | xargs -I % git branch -d %
 
 [help]
     autocorrect = 1
@@ -43,15 +46,18 @@
 [user]
     name  = b4b4r07
     email = b4b4r07@gmail.com
+	signingkey = BD24635709B7BDC1
 
 [pager]
     log  = diff-highlight | less -RX
     show = diff-highlight | less -RX
     diff = diff-highlight | less -RX
+    # diff = diff-so-fancy | less --tabs=4 -RFX
+    # diff = delta --dark --plus-color="#012800" --minus-color="#340001"
 
 [diff]
-    tool      = vimdiff
-    algorithm = histogram
+    tool                = vimdiff
+    algorithm           = histogram
     compactionHeuristic = true
 
 [ghq]
@@ -61,20 +67,11 @@
 [merge]
     tool = vimdiff
 
-[zgit "keybind"]
-    echo   = ctrl-e
-    add    = ctrl-a
-    add-p  = ctrl-w
-    commit = ctrl-c
-    diff   = ctrl-d
-    reset  = ctrl-r
-
-[zgit "default"]
-    toggle-all = ctrl-z
-
-[zgit "core"]
-    action   = status
-    tool     = enhancd
-    lessopen = "| pygmentize -O style=solarized -f console256 -g %s"
 [github]
 	user = b4b4r07
+
+[commit]
+	gpgSign = true
+
+[gpg]
+	program = gpg2

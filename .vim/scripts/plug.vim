@@ -60,12 +60,27 @@ if g:plug.ready() && g:env.vimrc.plugin_on
     Plug 'jelera/vim-javascript-syntax', { 'for': 'javascript' }
     Plug 'maksimr/vim-jsbeautify', { 'for': 'javascript' }
     Plug 'zplug/vim-zplug', { 'for': 'zplug' }
+    Plug 'rhysd/vim-fixjson', { 'for': 'json' }
     Plug 'raphael/vim-present-simple'
     Plug 'mattn/webapi-vim'
     Plug 'b4b4r07/vim-crowi'
     Plug 'mattn/goplayground-vim'
     Plug 'haya14busa/vim-gofmt'
     Plug 'kylef/apiblueprint.vim'
+    Plug 'millermedeiros/vim-esformatter'
+    Plug 'juvenn/mustache.vim'
+    Plug 'juliosueiras/vim-terraform-completion'
+    " (Optional) Enable terraform plan to be include in filter
+    let g:syntastic_terraform_tffilter_plan = 1
+    " (Optional) Default: 0, enable(1)/disable(0) plugin's keymapping
+    let g:terraform_completion_keys = 1
+    " (Optional) Default: 1, enable(1)/disable(0) terraform module registry completion
+    let g:terraform_registry_module_completion = 0
+
+    Plug '/Users/b4b4r07/src/github.com/b4b4r07/vim-spacing'
+
+    Plug 'b4b4r07/vim-ansible-vault'
+    Plug 'christianrondeau/vim-base64'
 
     " colorscheme
     Plug 'b4b4r07/solarized.vim'
@@ -83,10 +98,15 @@ if g:plug.ready() && g:env.vimrc.plugin_on
     Plug 'lepture/vim-jinja'
     Plug 'mattn/gist-vim'
 
-    Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+    " Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+    Plug 'stamblerre/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
     Plug 'cocopon/vaffle.vim'
     Plug 'hotwatermorning/auto-git-diff'
     Plug 'lambdalisue/vim-gista'
+    Plug 'aliou/bats.vim'
+    Plug 'chrisbra/csv.vim'
+
+    Plug 'w0rp/ale'
 
     " Add plugins to &runtimepath
     call plug#end()

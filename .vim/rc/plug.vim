@@ -54,6 +54,9 @@ if g:plug.ready() && g:config.vimrc.plugin_on
   Plug 'jelera/vim-javascript-syntax', { 'for': 'javascript' }
   Plug 'maksimr/vim-jsbeautify',       { 'for': 'javascript' }
   Plug 'plasticboy/vim-markdown',      { 'for': 'markdown' }
+  Plug 'hashivim/vim-terraform'
+  Plug 'rhysd/vim-fixjson', { 'for': 'json' }
+  Plug 'juliosueiras/vim-terraform-completion'
 
   Plug 'raphael/vim-present-simple'
   Plug 'mattn/webapi-vim'
@@ -61,6 +64,8 @@ if g:plug.ready() && g:config.vimrc.plugin_on
   Plug 'mattn/goplayground-vim'
   Plug 'haya14busa/vim-gofmt'
   Plug 'kylef/apiblueprint.vim'
+  Plug 'millermedeiros/vim-esformatter'
+  Plug 'juvenn/mustache.vim'
 
   Plug 'b4b4r07/solarized.vim'
   Plug 'w0ng/vim-hybrid'
@@ -69,6 +74,9 @@ if g:plug.ready() && g:config.vimrc.plugin_on
   Plug 'whatyouhide/vim-gotham'
 
   Plug 'pbogut/fzf-mru.vim'
+
+  Plug 'b4b4r07/vim-ansible-vault'
+  Plug 'christianrondeau/vim-base64'
 
   Plug 'b4b4r07/vim-unicode'
   Plug 'b4b4r07/vim-sqlfmt'
@@ -79,6 +87,7 @@ if g:plug.ready() && g:config.vimrc.plugin_on
   Plug 'cocopon/vaffle.vim'
   Plug 'hotwatermorning/auto-git-diff'
   Plug 'lambdalisue/vim-gista'
+  Plug 'chrisbra/csv.vim'
 
   " Add plugins to &runtimepath
   call plug#end()

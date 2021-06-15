@@ -1,44 +1,17 @@
-alias p="print -l"
-
-# For mac, aliases
-if is_osx; then
-    has "qlmanage" && alias ql='qlmanage -p "$@" >&/dev/null'
-    alias gvim="open -a MacVim"
-fi
-
-if has 'git'; then
-    alias gst='git status'
-fi
-
-if has 'richpager'; then
-    alias cl='richpager'
-fi
-
-if (( $+commands[gls] )); then
-    alias ls='gls -F --color --group-directories-first'
-elif (( $+commands[ls] )); then
-    if is_osx; then
-        alias ls='ls -GF'
-    else
-    alias ls='ls -F --color'
-    fi
-fi
-
 # Common aliases
 alias ..='cd ..'
-alias ld='ls -ld'          # Show info about the directory
-alias lla='ls -lAF'        # Show hidden all files
-alias ll='ls -lF'          # Show long file information
-alias la='ls -AF'          # Show hidden files
-alias lx='ls -lXB'         # Sort by extension
-alias lk='ls -lSr'         # Sort by size, biggest last
-alias lc='ls -ltcr'        # Sort by and show change time, most recent last
-alias lu='ls -ltur'        # Sort by and show access time, most recent last
-alias lt='ls -ltr'         # Sort by date, most recent last
-alias lr='ls -lR'          # Recursive ls
 
-# The ubiquitous 'll': directories first, with alphanumeric sorting:
-#alias ll='ls -lv --group-directories-first'
+# alias ll="ls -l"
+# alias ld='ls -ld'          # Show info about the directory
+# alias lla='ls -lAF'        # Show hidden all files
+# alias ll='ls -lF'          # Show long file information
+# alias la='ls -AF'          # Show hidden files
+# alias lx='ls -lXB'         # Sort by extension
+# alias lk='ls -lSr'         # Sort by size, biggest last
+# alias lc='ls -ltcr'        # Sort by and show change time, most recent last
+# alias lu='ls -ltur'        # Sort by and show access time, most recent last
+# alias lt='ls -ltr'         # Sort by date, most recent last
+# alias lr='ls -lR'          # Recursive ls
 
 alias cp="${ZSH_VERSION:+nocorrect} cp -i"
 alias mv="${ZSH_VERSION:+nocorrect} mv -i"
@@ -53,21 +26,21 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
-# Use if colordiff exists
-if has 'colordiff'; then
-    alias diff='colordiff -u'
-else
-    alias diff='diff -u'
-fi
-
 alias vi="vim"
 
 # Use plain vim.
-alias nvim='vim -N -u NONE -i NONE'
+# alias nvim='vim -N -u NONE -i NONE'
 
-# The first word of each simple command, if unquoted, is checked to see 
-# if it has an alias. [...] If the last character of the alias value is 
-# a space or tab character, then the next command word following the 
+if (( $+commands[kubectl] )); then
+    alias k=kubectl
+fi
+
+alias base='base64'
+alias based='base64 -d'
+
+# The first word of each simple command, if unquoted, is checked to see
+# if it has an alias. [...] If the last character of the alias value is
+# a space or tab character, then the next command word following the
 # alias is also checked for alias expansion
 alias sudo='sudo '
 if is_osx; then
@@ -86,6 +59,7 @@ alias -g N=" >/dev/null 2>&1"
 alias -g N1=" >/dev/null"
 alias -g N2=" 2>/dev/null"
 alias -g VI='| xargs -o vim'
+alias -g CSV="| sed 's/,,/, ,/g;s/,,/, ,/g' | column -s, -t"
 
 multi_grep() {
     local std_in="$(cat <&0)" word
@@ -101,11 +75,10 @@ multi_grep() {
 (( $+galiases[H] )) || alias -g H='| head'
 (( $+galiases[T] )) || alias -g T='| tail'
 
-if has "emojify"; then
-    alias -g E='| emojify'
-fi
+(( $+commands[emojify] )) && alias -g E='| emojify'
 
-if has "jq"; then
+if (( $+commands[jq] )); then
+    alias -g J='| jq -C . | less -F'
     alias -g JQ='| jq -C .'
     alias -g JL='| jq -C . | less -R -X'
 fi
@@ -129,7 +102,8 @@ cat_alias() {
         echo "${(F)stdin}"
     fi
 }
-alias -g C="| cat_alias"
+# alias -g C="| cat_alias"
+alias -g CP="| pbcopy"
 
 # less
 alias -g L="| cat_alias | less"
@@ -430,78 +404,85 @@ git_branch() {
 
 alias -g GB='$(git_branch)'
 
-if has "tw"; then
-    alias -g TW="| tw --pipe"
-    if has "emojify"; then
-        alias -g TW="| emojify | tw --pipe"
+alias -g P='$(kubectl get pods | fzf-tmux --header-lines=1 --reverse --multi --cycle | awk "{print \$1}")'
+alias -g F='| fzf --height 30 --reverse --multi --cycle'
+
+function filetime() {
+    zmodload "zsh/stat"
+    zmodload "zsh/datetime"
+    strftime "%F %T" "$(stat +mtime "${1:?}")"
+}
+
+function _gcloud_change_project() {
+    local proj=$(gcloud projects list | fzf --height 50% --header-lines=1 --reverse --multi --cycle | awk '{print $1}')
+    if [[ -n $proj ]]; then
+        gcloud config set project $proj
+        return $?
     fi
+}
+alias gcp=_gcloud_change_project
+
+alias yy="fc -ln -1 | tr -d '\n' | pbcopy"
+
+if (( $+commands[iap_curl] )); then
+    alias iap='iap_curl $(iap_curl --list | fzf --height 30% --reverse)'
 fi
 
-git_modified_files() {
-    is_git_repo || return
-
-    local cmd q k res ok
-    while ok=("${ok[@]:-dummy_$RANDOM}"); cmd="$(
-        git status --po \
-            | awk '$1=="M"{print $2}' \
-            | FZF_DEFAULT_OPTS= fzf --ansi --multi --query="$@" \
-            --no-sort --prompt="[C-a:add | C-c:checkout | C-d:diff]> " \
-            --print-query --expect=ctrl-d,ctrl-a,ctrl-c \
-            --bind=ctrl-z:toggle-all \
-            )"; do
-        q="$(head -1 <<< "$cmd")"
-        k="$(head -2 <<< "$cmd" | tail -1)"
-        res="$(sed '1,2d;/^$/d' <<< "$cmd")"
-        [ -z "$res" ] && continue
-        case "$k" in
-            ctrl-c)
-                if [[ ${(j: :)ok} == ${(j: :)${(@f)res}} ]]; then
-                    git checkout -- "${(@f)res}"
-                    ok=()
-                else
-                    ok=("${(@f)res}")
-                fi
-                ;;
-            ctrl-a)
-                git add "${(@f)res}"
-                ;;
-            ctrl-d)
-                git diff "${(@f)res}" < /dev/tty > /dev/tty
-                ;;
-            *)
-                echo "${(@f)res}" < /dev/tty > /dev/tty
-                break
-                ;;
-        esac
-    done
+function pet-select() {
+    BUFFER="$(pet search --color --query "$LBUFFER")"
+    CURSOR=$#BUFFER
+    zle redisplay
 }
-#alias -g GG='$(git_modified_files)'
 
-# treels() {
-#     local -a files=( *(D) )
-#     if (( $#files > $LINES )); then
-#         tree -C -L 1 -a -I .git
-#     else
-#         tree -C
-#     fi
-# }
+zle -N pet-select
+bindkey '^s' pet-select
 
-alias t="tree -C"
+function prev-add() {
+  local PREV=$(fc -lrn | head -n 1)
+  sh -c "pet new `printf %q "$PREV"`"
+}
 
-alias l="ls -l"
-
-# alias f='fzf --preview="pygmentize {}" --preview-window=right:60% --ansi --bind "enter:execute(vim {})"'
-
-function get_path() {
-    local f="${1:?}"
-    if [[ -t 1 ]]; then
-        # give a new line if stdout
-        printf "${f:A}\n"
-    else
-        printf "${f:A}"
+gchange() {
+    if ! type gcloud &>/dev/null; then
+        echo "gcloud not found" >&2
+        return 1
     fi
+    gcloud config configurations activate $(gcloud config configurations list | fzf-tmux --reverse --header-lines=1 | awk '{print $1}')
 }
 
-alias p="get_path"
+docker-rmi() {
+    docker images \
+        | fzf-tmux --reverse --header-lines=1 --multi --ansi \
+        | awk '{print $3}' \
+        | xargs docker rmi ${1+"$@"}
+}
 
-alias hs="command history"
+review() {
+    git diff --name-only origin/master... \
+        | fzf \
+        --ansi \
+        --multi \
+        --reverse \
+        --height 70% \
+        --preview-window down:70% \
+        --preview="if [[ -f {} ]]; then git diff --color=always origin/master... {}; fi" \
+        --bind "enter:execute-silent(vim {} </dev/tty >/dev/tty)"
+}
+
+git-replace()
+{
+    case $# in
+        (0)
+            echo "too few arguments" >&2
+            return 1
+            ;;
+        (1)
+            git grep $1
+            return $?
+            ;;
+        (*)
+            git grep -l $1 | xargs -I% sd $1 $2 %
+            return $?
+            ;;
+    esac
+}
